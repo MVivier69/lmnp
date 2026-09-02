@@ -97,54 +97,20 @@
     word-break:break-word;
   }
   .actions{
-    display:flex;
-    gap:10px;
     margin-top:20px;
   }
-  button{
-    flex:1;
-    font-size:.85rem;
+  a.btn{
+    display:block;
+    width:100%;
+    text-align:center;
+    text-decoration:none;
+    font-size:.9rem;
     font-weight:700;
-    padding:13px 10px;
+    padding:14px 10px;
     border-radius:var(--radius);
-    border:none;
-    cursor:pointer;
+    box-sizing:border-box;
   }
   .btn-primary{background:var(--navy);color:#fff;}
-  .btn-secondary{background:#fff;color:var(--navy);border:1px solid var(--navy);}
-  .btn-ghost{background:none;color:var(--grey);border:1px solid var(--line);}
-  #editPanel{display:none;margin-top:18px;}
-  #editPanel .card{padding:14px;}
-  #editPanel label{
-    display:block;
-    font-size:.72rem;
-    font-weight:700;
-    color:var(--navy);
-    margin:12px 0 4px;
-  }
-  #editPanel label:first-child{margin-top:0;}
-  #editPanel input{
-    width:100%;
-    padding:10px 12px;
-    font-size:.9rem;
-    border:1px solid var(--line);
-    border-radius:8px;
-    font-family:inherit;
-  }
-  #editPanel .edit-actions{
-    display:flex;
-    gap:10px;
-    margin-top:18px;
-  }
-  .reset-line{text-align:center;margin-top:10px;}
-  .reset-line a{color:var(--grey);font-size:.78rem;text-decoration:underline;}
-  .status{
-    text-align:center;
-    font-size:.72rem;
-    color:var(--grey);
-    margin-top:10px;
-    font-style:italic;
-  }
   .footer-note{
     margin-top:28px;
     padding-top:14px;
@@ -154,22 +120,12 @@
     font-style:italic;
     line-height:1.5;
   }
-  .toast{
-    position:fixed;
-    left:50%;
-    bottom:24px;
-    transform:translateX(-50%) translateY(20px);
-    background:var(--navy);
-    color:#fff;
-    padding:10px 18px;
-    border-radius:30px;
-    font-size:.82rem;
-    opacity:0;
-    transition:opacity .25s ease, transform .25s ease;
-    pointer-events:none;
-    z-index:10;
+  .footer-note code{
+    background:var(--labelbg);
+    padding:1px 4px;
+    border-radius:4px;
+    font-style:normal;
   }
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
@@ -208,202 +164,64 @@
   </section>
 
   <div class="actions">
-    <button class="btn-primary" id="btnVcard">➕ Ajouter le contact</button>
-    <button class="btn-secondary" id="btnEdit">✏️ Modifier</button>
-  </div>
-  <div class="status" id="statusLine"></div>
-
-  <div id="editPanel">
-    <h2 style="margin-top:24px;">Modifier les données</h2>
-    <div class="card">
-      <form id="editForm">
-        <label>Plateforme agréée</label><input name="plateforme">
-        <label>Raison sociale</label><input name="entreprise">
-        <label>SIRET</label><input name="siret">
-        <label>N° TVA intracommunautaire</label><input name="tva">
-        <label>Adresse</label><input name="adresse">
-        <label>Email</label><input name="email" type="email">
-        <label>Téléphone</label><input name="telephone">
-        <label>Cabinet — Interlocutrice</label><input name="cabinetNom">
-        <label>Cabinet — Fonction</label><input name="cabinetFonction">
-        <label>Cabinet — Société</label><input name="cabinetSociete">
-        <label>Cabinet — Email</label><input name="cabinetEmail" type="email">
-        <label>Cabinet — Téléphone</label><input name="cabinetTelephone">
-        <label>Cabinet — Site web</label><input name="cabinetSite">
-        <div class="edit-actions">
-          <button type="submit" class="btn-primary">💾 Enregistrer</button>
-          <button type="button" class="btn-ghost" id="btnCancel">Annuler</button>
-        </div>
-      </form>
-    </div>
-    <div class="reset-line"><a href="#" id="btnReset">Réinitialiser aux valeurs par défaut du dépôt</a></div>
+    <a class="btn btn-primary" id="btnMail" href="#">📧 Envoyer par mail</a>
   </div>
 
   <div class="footer-note">
-    Cette page affiche les données de facturation électronique de VIVIER MICHEL LMNP.
-    Le bouton « Modifier » enregistre vos changements uniquement sur cet appareil
-    (stockage local du navigateur) : ils ne sont pas publiés et ne sont visibles que par vous, sur ce même appareil et ce même navigateur.
-    Pour changer la version publique (visible par tout le monde), il faut éditer le fichier
-    <code>config.js</code> du dépôt GitHub et republier.
+    Données de facturation électronique de VIVIER MICHEL LMNP. Le contenu de cette page est défini
+    dans le fichier <code>config.js</code> du dépôt GitHub : c'est la seule source à modifier pour
+    la mettre à jour. Le bouton « Envoyer par mail » ouvre votre messagerie habituelle avec un
+    message pré-rempli contenant un lien vers cette page et vers la fiche PDF ; un navigateur ne
+    permettant pas de joindre automatiquement un fichier à un email, la fiche PDF n'est pas jointe
+    mais reste accessible en un clic depuis le message.
   </div>
 
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script src="config.js"></script>
 <script>
 (function(){
   "use strict";
 
-  var STORAGE_KEY = "lmnp_facturation_data_v1";
   var FIELDS = ["plateforme","entreprise","siret","tva","adresse","email","telephone",
                 "cabinetNom","cabinetFonction","cabinetSociete","cabinetEmail","cabinetTelephone","cabinetSite"];
 
-  function getDefaults(){
-    // window.SITE_DATA vient de config.js ; si ce fichier est absent/mal chargé,
-    // on retombe sur des champs vides plutôt que d'inventer des valeurs.
+  var PAGE_URL = "https://mvivier69.github.io/lmnp/";
+  var PDF_URL = "https://mvivier69.github.io/lmnp/Fiche_Facturation_Electronique_-_VIVIER_MICHEL_LMNP.pdf";
+
+  function getData(){
+    // window.SITE_DATA vient de config.js ; si absent/mal chargé, on affiche des
+    // champs vides plutôt que d'inventer des valeurs.
     var base = window.SITE_DATA || {};
     var out = {};
     FIELDS.forEach(function(k){ out[k] = base[k] || ""; });
     return out;
   }
 
-  function loadStored(){
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return null;
-      var parsed = JSON.parse(raw);
-      return parsed && parsed.data ? parsed : null;
-    }catch(e){
-      console.warn("Lecture localStorage impossible :", e);
-      return null;
-    }
-  }
-
-  function getCurrent(){
-    var stored = loadStored();
-    if(stored) return stored;
-    return { data: getDefaults(), updatedAt: null, source: "default" };
-  }
-
-  function render(state){
-    var d = state.data;
+  function render(d){
     FIELDS.forEach(function(k){
       var el = document.getElementById("f-" + k);
       if(el) el.textContent = d[k] && d[k].trim() ? d[k] : "—";
     });
-    var status = document.getElementById("statusLine");
-    if(state.source === "local" && state.updatedAt){
-      var dt = new Date(state.updatedAt);
-      status.textContent = "Modifié localement le " + dt.toLocaleDateString("fr-FR") +
-        " à " + dt.toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}) +
-        " (visible sur cet appareil uniquement)";
-    } else {
-      status.textContent = "Données par défaut du dépôt";
-    }
   }
 
-  function fillForm(data){
-    var form = document.getElementById("editForm");
-    FIELDS.forEach(function(k){
-      if(form.elements[k]) form.elements[k].value = data[k] || "";
-    });
+  function buildMailLink(d){
+    var subject = "Facturation électronique — " + d.entreprise;
+    var body =
+      "Bonjour,\n\n" +
+      "Voici la fiche de facturation électronique de " + d.entreprise +
+      " (plateforme agréée : " + d.plateforme + ") :\n\n" +
+      "Page à jour : " + PAGE_URL + "\n" +
+      "Fiche au format PDF : " + PDF_URL + "\n\n" +
+      "SIRET : " + d.siret + "\n" +
+      "N° TVA intracommunautaire : " + d.tva + "\n\n" +
+      "Cordialement,";
+    return "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
   }
 
-  function showToast(msg){
-    var t = document.getElementById("toast");
-    t.textContent = msg;
-    t.classList.add("show");
-    setTimeout(function(){ t.classList.remove("show"); }, 2200);
-  }
-
-  // ---- vCard ----
-  function escapeVCard(str){
-    return String(str || "")
-      .replace(/\\/g, "\\\\")
-      .replace(/\n/g, "\\n")
-      .replace(/,/g, "\\,")
-      .replace(/;/g, "\\;");
-  }
-
-  function buildVCard(d){
-    var lines = [
-      "BEGIN:VCARD",
-      "VERSION:3.0",
-      "FN:" + escapeVCard(d.entreprise),
-      "ORG:" + escapeVCard(d.entreprise),
-      "TEL;TYPE=CELL:" + escapeVCard(d.telephone),
-      "EMAIL:" + escapeVCard(d.email),
-      "ADR;TYPE=WORK:;;" + escapeVCard(d.adresse) + ";;;;",
-      "NOTE:" + escapeVCard(
-        "Facturation electronique - Plateforme agreee : " + d.plateforme + ". " +
-        "SIRET : " + d.siret + ". " +
-        "N. TVA intracommunautaire : " + d.tva + ". " +
-        "Cabinet comptable : " + d.cabinetNom + " (" + d.cabinetFonction + ") - " +
-        d.cabinetSociete + " - " + d.cabinetEmail + " - " + d.cabinetTelephone + " - " + d.cabinetSite
-      ),
-      "END:VCARD"
-    ];
-    return lines.join("\r\n") + "\r\n";
-  }
-
-  function downloadVCard(){
-    var state = getCurrent();
-    var vcard = buildVCard(state.data);
-    var blob = new Blob([vcard], { type: "text/vcard;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "vivier-michel-lmnp.vcf";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 4000);
-  }
-
-  // ---- Edition ----
-  function openEdit(){
-    fillForm(getCurrent().data);
-    document.getElementById("editPanel").style.display = "block";
-    document.getElementById("editPanel").scrollIntoView({behavior:"smooth", block:"start"});
-  }
-  function closeEdit(){
-    document.getElementById("editPanel").style.display = "none";
-  }
-  function saveEdit(ev){
-    ev.preventDefault();
-    var form = document.getElementById("editForm");
-    var data = {};
-    FIELDS.forEach(function(k){ data[k] = form.elements[k].value.trim(); });
-    var state = { data: data, updatedAt: new Date().toISOString(), source: "local" };
-    try{
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }catch(e){
-      showToast("Impossible d'enregistrer (stockage local indisponible)");
-      return;
-    }
-    render(state);
-    closeEdit();
-    showToast("Modifications enregistrées sur cet appareil");
-  }
-  function resetDefaults(ev){
-    if(ev) ev.preventDefault();
-    if(!window.confirm("Revenir aux valeurs par défaut du dépôt et effacer vos modifications locales ?")) return;
-    localStorage.removeItem(STORAGE_KEY);
-    var state = { data: getDefaults(), updatedAt: null, source: "default" };
-    render(state);
-    fillForm(state.data);
-    showToast("Valeurs par défaut restaurées");
-  }
-
-  document.getElementById("btnVcard").addEventListener("click", downloadVCard);
-  document.getElementById("btnEdit").addEventListener("click", openEdit);
-  document.getElementById("btnCancel").addEventListener("click", closeEdit);
-  document.getElementById("editForm").addEventListener("submit", saveEdit);
-  document.getElementById("btnReset").addEventListener("click", resetDefaults);
-
-  render(getCurrent());
+  var data = getData();
+  render(data);
+  document.getElementById("btnMail").setAttribute("href", buildMailLink(data));
 })();
 </script>
 </body>
