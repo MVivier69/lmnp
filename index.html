@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Facturation électronique — VIVIER MICHEL LMNP</title>
 <meta name="description" content="Fiche de référence pour la facturation électronique">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   :root{
     --navy:#14293D;
@@ -164,16 +166,15 @@
   </section>
 
   <div class="actions">
-    <a class="btn btn-primary" id="btnMail" href="#">📧 Envoyer par mail</a>
+    <a class="btn btn-primary" id="btnPdf" href="./Fiche_Facturation_Electronique_-_VIVIER_MICHEL_LMNP.pdf" download>📄 Télécharger au format PDF</a>
   </div>
 
   <div class="footer-note">
     Données de facturation électronique de VIVIER MICHEL LMNP. Le contenu de cette page est défini
     dans le fichier <code>config.js</code> du dépôt GitHub : c'est la seule source à modifier pour
-    la mettre à jour. Le bouton « Envoyer par mail » ouvre votre messagerie habituelle avec un
-    message pré-rempli contenant un lien vers cette page et vers la fiche PDF ; un navigateur ne
-    permettant pas de joindre automatiquement un fichier à un email, la fiche PDF n'est pas jointe
-    mais reste accessible en un clic depuis le message.
+    la mettre à jour. Le bouton « Télécharger au format PDF » télécharge la fiche telle qu'hébergée
+    dans le dépôt ; pensez à la régénérer si les données de <code>config.js</code> changent, les deux
+    fichiers n'étant pas liés automatiquement.
   </div>
 
 </div>
@@ -185,9 +186,6 @@
 
   var FIELDS = ["plateforme","entreprise","siret","tva","adresse","email","telephone",
                 "cabinetNom","cabinetFonction","cabinetSociete","cabinetEmail","cabinetTelephone","cabinetSite"];
-
-  var PAGE_URL = "https://mvivier69.github.io/lmnp/";
-  var PDF_URL = "https://mvivier69.github.io/lmnp/Fiche_Facturation_Electronique_-_VIVIER_MICHEL_LMNP.pdf";
 
   function getData(){
     // window.SITE_DATA vient de config.js ; si absent/mal chargé, on affiche des
@@ -205,23 +203,7 @@
     });
   }
 
-  function buildMailLink(d){
-    var subject = "Facturation électronique — " + d.entreprise;
-    var body =
-      "Bonjour,\n\n" +
-      "Voici la fiche de facturation électronique de " + d.entreprise +
-      " (plateforme agréée : " + d.plateforme + ") :\n\n" +
-      "Page à jour : " + PAGE_URL + "\n" +
-      "Fiche au format PDF : " + PDF_URL + "\n\n" +
-      "SIRET : " + d.siret + "\n" +
-      "N° TVA intracommunautaire : " + d.tva + "\n\n" +
-      "Cordialement,";
-    return "mailto:?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-  }
-
-  var data = getData();
-  render(data);
-  document.getElementById("btnMail").setAttribute("href", buildMailLink(data));
+  render(getData());
 })();
 </script>
 </body>
