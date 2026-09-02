@@ -30,7 +30,7 @@ window.SITE_DATA = {
   cabinetNom: "Alexandra DAVRIL",
   cabinetFonction: "Expertise TPE & PME | Responsable de mission",
   cabinetSociete: "COGEPARC LYON",
-  cabinetEmail: "adavril@COGEPARC.com",
+  cabinetEmail: "adavril@cogeparc.com",
   cabinetTelephone: "+33 (0)4 72 53 25 64",
   cabinetSite: "www.cogeparc.com"
 };
